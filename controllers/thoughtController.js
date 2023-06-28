@@ -2,7 +2,7 @@ const { Thought, User } = require("../models");
 
 module.exports = {
   // Get all thoughts
-  async getCourses(req, res) {
+  async getThoughts(req, res) {
     try {
       const thoughts = await Thought.find().sort({ createdAt: -1 });
       res.json(thoughts);
@@ -122,7 +122,7 @@ module.exports = {
   },
 
   // Remove a reaction by the reaction's reactionId value
-  async removeFriend(req, res) {
+  async removeReaction(req, res) {
     try {
       const user = await Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
