@@ -23,6 +23,7 @@ module.exports = {
       }
       res.json(user);
     } catch (err) {
+      console.log(err);
       res.status(500).json(err);
     }
   },
@@ -31,8 +32,10 @@ module.exports = {
   async createUser(req, res) {
     try {
       const user = await User.create(req.body);
+      console.log("User create", user);
       res.json(user);
     } catch (err) {
+      console.log("Err", err);
       res.status(500).json(err);
     }
   },
@@ -80,7 +83,7 @@ module.exports = {
     try {
       const user = await User.findOneAndUpdate(
         { _id: req.params.userId },
-        { $addToSet: { friends: req.body } },
+        { $addToSet: { friends: req.params.friendId } },
         { runValidators: true, new: true }
       );
 
@@ -101,7 +104,7 @@ module.exports = {
     try {
       const user = await User.findOneAndUpdate(
         { _id: req.params.userId },
-        { $pull: { friend: { friendId: req.params.friendId } } },
+        { $pull: { friends: req.params.friendId } },
         { runValidators: true, new: true }
       );
 
@@ -117,5 +120,3 @@ module.exports = {
     }
   },
 };
-
-module.exports = userController;

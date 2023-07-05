@@ -7,6 +7,7 @@ module.exports = {
       const thoughts = await Thought.find().sort({ createdAt: -1 });
       res.json(thoughts);
     } catch (err) {
+      console.log(err, "Get all thoughts");
       res.status(500).json(err);
     }
   },
@@ -20,8 +21,9 @@ module.exports = {
       if (!thought) {
         return res.status(404).json({ message: "No thought with that ID" });
       }
-      res.json(user);
+      res.json(thought);
     } catch (err) {
+      console.log("err thought by id", err);
       res.status(500).json(err);
     }
   },
@@ -29,7 +31,7 @@ module.exports = {
   // create a new thought and push the created thought's _id to the associated user's thoughts array field
   async createThought(req, res) {
     try {
-      const thought = await Thought.create(req.body)
+      Thought.create(req.body)
         .then((thought) => {
           return User.findOneAndUpdate(
             { _id: req.body.userId },
@@ -39,13 +41,14 @@ module.exports = {
         })
         .then((user) => {
           if (!user) {
-            return res
-              .status(404)
-              .json({ message: "Thought created and no user with that ID" });
+            return res.status(404).json({
+              message: "Thought created and no user with that ID",
+            });
           }
-          res.json({ message: "Thought created successfully", thought });
+          res.json({ message: "Thought created successfully", user });
         });
     } catch (err) {
+      console.log(err);
       res.status(500).json(err);
     }
   },
@@ -103,7 +106,7 @@ module.exports = {
     console.log(req.body);
 
     try {
-      const user = await Thought.findOneAndUpdate(
+      const thought = await Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $addToSet: { reactions: req.body } },
         { runValidators: true, new: true }
@@ -117,6 +120,7 @@ module.exports = {
 
       res.json(thought);
     } catch (err) {
+      console.log("Reaction", err);
       res.status(500).json(err);
     }
   },
@@ -124,7 +128,7 @@ module.exports = {
   // Remove a reaction by the reaction's reactionId value
   async removeReaction(req, res) {
     try {
-      const user = await Thought.findOneAndUpdate(
+      const thought = await Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $pull: { reactions: { reactionId: req.params.reactionId } } },
         { runValidators: true, new: true }
@@ -138,9 +142,7 @@ module.exports = {
 
       res.json(thought);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json(err.message);
     }
   },
 };
-
-module.exports = thoughtController;
